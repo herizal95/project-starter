@@ -1,1 +1,1 @@
-# project-starter
+# Golang project-starter
