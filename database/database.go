@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/herizal95/project-starter/config/db_config"
-	"github.com/herizal95/project-starter/models/entity"
+	"github.com/herizal95/project-starter/database/migration"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -27,12 +27,17 @@ func ConnectDatabase() {
 	}
 
 	if errConnection != nil {
-		panic("Could not connection to the database.")
+		log.Fatal("Could not connect to the database: ", errConnection)
 	}
 
-	DB.AutoMigrate(
-		entity.User{},
-	)
+	for _, model := range migration.RegisterModels() {
+		errAutoMigrate := DB.Debug().AutoMigrate(model.Model)
+		if errAutoMigrate != nil {
+			log.Fatal("Error during automigrate: ", errAutoMigrate)
+		}
+	}
+
+	fmt.Println("Database Migrate Successfully")
 
 	log.Println("Successfully connect to the database")
 }
